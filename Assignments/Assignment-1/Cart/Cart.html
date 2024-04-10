@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Shopping Cart</h1>
+      <div class="products-container" id="products-container"></div>
+      <div class="cart" id="cart">
+        <h2>Your Cart</h2>
+        <div class="cart-items" id="cart-items"></div>
+        <p>Total: ₹<span id="total"></span></p>
+      </div>
+    </div>
+    <script>
+      const styleElement = document.createElement("style");
+      styleElement.textContent = `
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                display: flex;
+                justify-content: center;
+                background-color: #C5C6C7;
+            }
+            .container {
+                max-width: 800px;
+                margin: 20px;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                text-align: center;
+                width: 100%;
+                color: #333;
+            }
+            .products-container {
+                display: flex;
+                justify-content: space-around;
+                flex-wrap: wrap;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .product-container {
+                width: 220px;
+                margin-bottom: 10px;
+                margin-right: 20px;
+                height: 420px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                overflow: hidden;
+                transition: transform 0.3s ease;
+                position: relative;
+            }
+            .product-container:hover {
+                transform: translateY(-5px);
+            }
+            .product {
+                text-align: center;
+                padding: 10px;
+                width: 100%;
+                height: 100%;
+            }
+            .product img {
+                width: 100%;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+            .product h2 {
+                margin-top: 0;
+                color: #333;
+            }
+            .product p {
+                margin-bottom: 10px;
+                color: #666;
+            }
+            .product button {
+                background-color: #007bff;
+                color: #f5f5f5;
+                border: none;
+                border-radius: 5px;
+                padding: 5px 10px;
+                cursor: pointer;
+                width: 100%;
+                transition: background-color 0.3s ease;
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .product button:hover {
+                background-color: #0056b3;
+            }
+            .cart {
+                width: 300px;
+                display: none;
+                background-color: #fff;
+                border-radius: 10px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+            }
+            .cart-items {
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                padding: 10px;
+            }
+            .cart-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+            .cart-item button {
+                border: none;
+                border-radius: 5%;
+                padding: 5px;
+                cursor: pointer;
+            }
+            .cart-item button:hover {
+                background-color: blue;
+            }
+            #total {
+                font-weight: bold;
+            }
+        `;
+      document.head.appendChild(styleElement);
+
+      const productsContainer = document.getElementById("products-container");
+      const productsData = [
+        { name: "I Phone", price: 120000, imgSrc: "images 1.jpg" },
+        { name: "Samsung", price: 110000, imgSrc: "images 2.webp" },
+        { name: "Oneplus", price: 65000, imgSrc: "images 3.jpg" },
+      ];
+
+      productsData.forEach((product) => {
+        const productContainer = document.createElement("div");
+        productContainer.classList.add("product-container");
+
+        const productHTML = `
+                <div class="product" data-price="${product.price}" data-name="${
+          product.name
+        }">
+                    <img src="${product.imgSrc}" alt="${product.name}" />
+                    <h2>${product.name}</h2>
+                    <p>Price: ₹${product.price.toLocaleString()}</p>
+                    <button class="add-to-cart-btn">Add to Cart</button>
+                </div>
+            `;
+        productContainer.innerHTML = productHTML;
+
+        productsContainer.appendChild(productContainer);
+      });
+      let cart = {};
+      const cartSection = document.getElementById("cart");
+      document.addEventListener("DOMContentLoaded", function () {
+        const addToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+        addToCartButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const productName = button.parentElement.dataset.name;
+            addToCart(productName);
+          });
+        });
+      });
+      function showCart() {
+        cartSection.style.display = "block";
+      }
+      function addToCart(name) {
+        const product = document.querySelector(`[data-name="${name}"]`);
+        const price = parseFloat(product.dataset.price);
+        if (cart[name]) {
+          cart[name].quantity++;
+        } else {
+          cart[name] = {
+            name,
+            price,
+            quantity: 1,
+          };
+        }
+        displayCart();
+        showCart();
+      }
+      function removeFromCart(name) {
+        if (cart[name].quantity > 1) {
+          cart[name].quantity--;
+        } else {
+          delete cart[name];
+        }
+        displayCart();
+      }
+      function displayCart() {
+        let cartItemsHTML = "";
+        let total = 0;
+        for (const name in cart) {
+          const product = cart[name];
+          cartItemsHTML += `<div class="cart-item">
+                    <span>${product.name}</span>
+                    <div>
+                        <button class="remove-from-cart-btn" onclick="removeFromCart('${name}')">-</button>
+                        <span>${product.quantity}</span>
+                        <button class="add-to-cart-btn" onclick="addToCart('${name}')">+</button>
+                        <span>(₹${(
+                          product.price * product.quantity
+                        ).toLocaleString()})</span>
+                    </div>
+                </div>`;
+          total += product.price * product.quantity;
+        }
+        document.getElementById("cart-items").innerHTML = cartItemsHTML;
+        document.getElementById("total").innerHTML = total.toLocaleString();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<head>
+    <title>Giphy Project</title>
+    <link rel="stylesheet" href="index.css"></link>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Lobster&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap')
+    </style>
+</head>
+<body>
+    <hr><h1 id="heading">GIPHY</h1><hr>
+    <input id="searchbox" type="text" placeholder="Search here.." autofocus/>
+    <h2 id="result_type">Trending</h2>
+    <div class="gifs"></div>
+    <script>
+        const container = document.querySelector('.gifs');
+let searchbox=document.getElementById('searchbox');
+
+const apiKey = 'sn5SiZ85xMWAYLdOZ3M9kp4Cqfn8raPA';
+const endpoint = `https://api.giphy.com/v1/gifs/trending?api_key=${apiKey}&limit=50`;
+
+function tranding(){
+fetch(endpoint)
+  .then(response => response.json()) // Parse the response as JSON
+  .then(data => {
+    data.data.forEach(gif => {
+      let img = document.createElement('img');
+      img.id='images';
+      img.src = gif.images.original.url;
+      img.alt = gif.title;
+      container.appendChild(img);
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching GIFs:', error);
+  });
+}
+
+tranding();
+
+document.addEventListener('keydown',(e)=>{
+  let keypressed=e.key;
+  if(keypressed=="Enter"){
+    let find=searchbox.value;
+    if(find){
+      console.log(find);
+      const url=`http://api.giphy.com/v1/gifs/search?q=${find}&api_key=${apiKey}&limit=50`;
+      try{
+      fetch(url)
+      .then(response=>response.json())
+      .then(document.getElementById('result_type').innerHTML="Your Search",container.innerHTML="")
+      .then(data=>{
+        data.data.forEach(gif => {
+          let img = document.createElement('img');
+          img.id='images';
+          img.src = gif.images.original.url;
+          img.alt = gif.title;
+          container.appendChild(img);
+      })
+    })
+    document.getElementById('result_type').innerHTML="Your Search"
+  }catch(e){
+    alert('error while searching',find);
+    console.log(e);
+  }
+  }
+  else{
+    conso
+  le.log("Please search something");
+  }
+}
+})</script>
+</body>
+</html>
